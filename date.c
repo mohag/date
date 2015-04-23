@@ -91,6 +91,7 @@
 #define ESETTIME 13
 #define ECMDLINE 14
 #define EBUFFALLOC 15
+#define ESHOWHELP 100           /* no an error */
 
 /****************************************************************************
  * Private Function Prototypes
@@ -159,6 +160,9 @@ static char *errormsg(const unsigned char code)
       break;
     case EBUFFALLOC:
       return "unable to allocate buffer!";
+      break;
+    case ESHOWHELP:            /* Should not be hit, but here in case... */
+      return "help requested";
       break;
     default:
       return "unknown error";
@@ -381,9 +385,9 @@ int main(int argc, char **argv)
               }
           }
           break;
-        case 'h':
+        case ESHOWHELP:
           {
-            err = 'h';
+            err = ESHOWHELP;
           }
           break;
         default:
@@ -422,7 +426,7 @@ int main(int argc, char **argv)
         return error(ECMDLINE, 0);
       }
       break;
-    case 'h':
+    case ESHOWHELP:
       {
         usage();
         return 0;
