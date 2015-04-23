@@ -385,7 +385,7 @@ int main(int argc, char **argv)
               }
           }
           break;
-        case ESHOWHELP:
+        case 'h':
           {
             err = ESHOWHELP;
           }
