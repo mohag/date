@@ -75,6 +75,23 @@
 #  define free(a)
 #endif
 
+/* Errors */
+#define ETOOMANYARGS 1
+#define EUTCMODE 2
+#define ERESPRINT 3
+#define ENONDIGIT 4
+#define ETIMEFMT 5
+#define ESEC 6
+#define ETIMELEN 7
+#define ENEGEPOCH 8
+#define EMON 9
+#define EDMON 10
+#define EHOUR 11
+#define EMIN 12
+#define ESETTIME 13
+#define ECMDLINE 14
+#define EBUFFALLOC 15
+
 /****************************************************************************
  * Private Function Prototypes
  ****************************************************************************/
@@ -94,8 +111,99 @@ static void usage(void)
           "Use the given format to display the date or set the date/time.\n");
 }
 
-static int error(const int code, const char *message, const int errno_input)
+static char * errormsg(const unsigned char code)
 {
+  switch (code)
+    {
+    case ETOOMANYARGS:
+      {
+        return "too many arguments";
+      }
+      break;
+    case EUTCMODE:
+      {
+        return "unable to set UTC mode";
+      }
+      break;
+    case ERESPRINT:
+      {
+        return "unable to print result";
+      }
+      break;
+    case ENONDIGIT:
+      {
+        return "invalid character in time string";
+      }
+      break;
+    case ETIMEFMT:
+      {
+        return "time formatting failed";
+      }
+      break;
+    case ESEC:
+      {
+        return "invalid seconds value";
+      }
+      break;
+    case ETIMELEN:
+      {
+        return "invalid time length";
+      }
+      break;
+    case ENEGEPOCH:
+      {
+        return "negative epoch time";
+      }
+      break;
+    case EMON:
+      {
+        return "invalid month";
+      }
+      break;
+    case EDMON:
+      {
+        return "invalid day of month";
+      }
+      break;
+    case EHOUR:
+      {
+        return "invalid hour";
+      }
+      break;
+    case EMIN:
+      {
+        return "invalid min";
+      }
+      break;
+    case ESETTIME:
+      {
+        return "unable to set time";
+      }
+      break;
+    case ECMDLINE:
+      {
+        return "invalid command line";
+      }
+      break;
+    case EBUFFALLOC:
+      {
+        return "unable to allocate buffer!";
+      }
+      break;
+    default:
+      {
+        return "unknown error";
+      }
+      break;
+    }
+}
+
+static int error(const unsigned char code, const int errno_input)
+{
+  char *message;
+
+  message = errormsg(code);
+
   fprintf(stderr, "Error: %s", message);
   if (errno_input)
     {
@@ -138,7 +246,7 @@ static int settime(char *timestring)
             }
           else
             {
-              return error(4, "invalid character in time string", 0);
+              return error(ENONDIGIT, 0);
             }
         }
     }
@@ -149,13 +257,13 @@ static int settime(char *timestring)
       *dot++ = '\0';            /* Split off seconds string */
       if (strlen(dot) != 2)
         {
-          return error(5, "syntax error in seconds", 0);
+          return error(ESEC, 0);
         }
       time.tm_sec = ATOI2(dot, 0);
 
       /* Range check. This allows for a single leap second as per C11 */
       if (time.tm_sec > 60)
-        return error(6, "seconds out of range", 0);
+        return error(ESEC, 0);
     }
   else
     {
@@ -182,25 +290,25 @@ static int settime(char *timestring)
     case 8:
       time.tm_mon = ATOI2(timestring, 0);
       if (--(time.tm_mon) > 11) /* tm months are zero based */
-        return error(9, "invalid month", 0);
+        return error(EMON, 0);
       time.tm_mday = ATOI2(timestring, 2);
       if (time.tm_mday > 31 || time.tm_mday < 1)
-        return error(10, "invalid day of month", 0);
+        return error(EDMON, 0);
       time.tm_hour = ATOI2(timestring, 4);
       if (time.tm_hour > 23)
-        return error(11, "invalid hour", 0);
+        return error(EHOUR, 0);
       time.tm_min = ATOI2(timestring, 6);
       if (time.tm_min > 59)
-        return error(12, "invalid min", 0);
+        return error(EMIN, 0);
       break;
     default:
-      return error(7, "invalid time length", 0);
+      return error(ETIMELEN, 0);
     }
 
   /* Optional extended year check */
 #ifndef DATE_ALLOW_NEG_EPOCH
   if (time.tm_year < 70)
-    return error(8, "negative epoch time", 0);
+    return error(ENEGEPOCH, 0);
 #endif
 
   time.tm_isdst = -1;
@@ -215,7 +323,7 @@ static int settime(char *timestring)
     }
   else
     {
-      return error(13, "unable to set time", errno);
+      return error(ESETTIME, errno);
     }
 }
 
@@ -245,7 +353,7 @@ static int showtime(const char *format)
       buffer = realloc(buffer, buffsize * sizeof(char));
       if (buffer == NULL)
         {
-          return error(15, "unable to allocate buffer!", 0);
+          return error(EBUFFALLOC, 0);
         }
 #endif
 
@@ -261,7 +369,7 @@ static int showtime(const char *format)
    * standards, so it is possible) */
   if (result == 0 && buffer[0] != 0)
     {
-      return error(4, "time formatting failed", 0);
+      return error(ETIMEFMT, 0);
     }
   if (fprintf(stdout, "%s\n", buffer) > 0)      /* Will at least print \n */
     {
@@ -271,7 +379,7 @@ static int showtime(const char *format)
   else
     {
       free(buffer);
-      return error(3, "unable to print result", 0);
+      return error(ERESPRINT, 0);
     }
 }
 
@@ -297,7 +405,7 @@ int main(int argc, char **argv)
           {
             if (setenv("TZ", "UTC0", 1) != 0)
               {
-                err = 2;
+                err = EUTCMODE;
               }
             else
               {
@@ -312,7 +420,7 @@ int main(int argc, char **argv)
           break;
         default:
           {
-            err = 14;
+            err = ECMDLINE;
           }
           break;
         }
@@ -322,7 +430,7 @@ int main(int argc, char **argv)
       if (string != NULL)       /* This will trigger if we loop through here
                                  * more than once... */
         {
-          err = 1;
+          err = ETOOMANYARGS;
         }
       string = argv[index];
     }
@@ -331,18 +439,19 @@ int main(int argc, char **argv)
    * interrupted... */
   switch (err)
     {
-    case 1:
+    case ETOOMANYARGS:
       {
-        return error(1, "too many arguments", 0);
-      }
-    case 2:
-      {
-        return error(2, "unable to set UTC mode", 0);
+        return error(ETOOMANYARGS, 0);
       }
       break;
-    case 14:
+    case EUTCMODE:
       {
-        return error(14, "invalid command line", 0);
+        return error(EUTCMODE, 0);
+      }
+      break;
+    case ECMDLINE:
+      {
+        return error(ECMDLINE, 0);
       }
       break;
     case 'h':
