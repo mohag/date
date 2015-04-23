@@ -111,7 +111,7 @@ static void usage(void)
           "Use the given format to display the date or set the date/time.\n");
 }
 
-static char * errormsg(const unsigned char code)
+static char *errormsg(const unsigned char code)
 {
   switch (code)
     {
