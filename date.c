@@ -116,84 +116,52 @@ static char *errormsg(const unsigned char code)
   switch (code)
     {
     case ETOOMANYARGS:
-      {
-        return "too many arguments";
-      }
+      return "too many arguments";
       break;
     case EUTCMODE:
-      {
-        return "unable to set UTC mode";
-      }
+      return "unable to set UTC mode";
       break;
     case ERESPRINT:
-      {
-        return "unable to print result";
-      }
+      return "unable to print result";
       break;
     case ENONDIGIT:
-      {
-        return "invalid character in time string";
-      }
+      return "invalid character in time string";
       break;
     case ETIMEFMT:
-      {
-        return "time formatting failed";
-      }
+      return "time formatting failed";
       break;
     case ESEC:
-      {
-        return "invalid seconds value";
-      }
+      return "invalid seconds value";
       break;
     case ETIMELEN:
-      {
-        return "invalid time length";
-      }
+      return "invalid time length";
       break;
     case ENEGEPOCH:
-      {
-        return "negative epoch time";
-      }
+      return "negative epoch time";
       break;
     case EMON:
-      {
-        return "invalid month";
-      }
+      return "invalid month";
       break;
     case EDMON:
-      {
-        return "invalid day of month";
-      }
+      return "invalid day of month";
       break;
     case EHOUR:
-      {
-        return "invalid hour";
-      }
+      return "invalid hour";
       break;
     case EMIN:
-      {
-        return "invalid min";
-      }
+      return "invalid min";
       break;
     case ESETTIME:
-      {
-        return "unable to set time";
-      }
+      return "unable to set time";
       break;
     case ECMDLINE:
-      {
-        return "invalid command line";
-      }
+      return "invalid command line";
       break;
     case EBUFFALLOC:
-      {
-        return "unable to allocate buffer!";
-      }
+      return "unable to allocate buffer!";
       break;
     default:
-      {
-        return "unknown error";
-      }
+      return "unknown error";
       break;
     }
 }
