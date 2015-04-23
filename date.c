@@ -307,12 +307,12 @@ int main(int argc, char **argv)
           break;
         case 'h':
           {
-            err = 3;
+            err = 'h';
           }
           break;
         default:
           {
-            err = 4;
+            err = 14;
           }
           break;
         }
@@ -340,15 +340,15 @@ int main(int argc, char **argv)
         return error(2, "unable to set UTC mode", 0);
       }
       break;
-    case 3:
+    case 14:
+      {
+        return error(14, "invalid command line", 0);
+      }
+      break;
+    case 'h':
       {
         usage();
         return 0;
-      }
-      break;
-    case 4:
-      {
-        return error(14, "invalid command line", 0);
       }
       break;
     default:
