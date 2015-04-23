@@ -189,7 +189,7 @@ static int error(const unsigned char code, const int errno_input)
 
       usage();
     }
-  return code;
+  return (int)code;
 }
 #endif
 
